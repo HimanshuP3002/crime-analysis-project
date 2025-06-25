@@ -3,6 +3,4 @@ __pycache__/
 .env
 *.env
 db.sqlite3
-node_modules/
-media/
 staticfiles
