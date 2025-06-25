@@ -1,0 +1,306 @@
+{% load static %} 
+
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>CrimeAnalysis</title>
+  <!-- plugins:css -->
+  <link rel="stylesheet" href="{% static 'assets/vendors/mdi/css/materialdesignicons.min.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/vendors/css/vendor.bundle.base.css' %}" />
+  <!-- endinject -->
+  <!-- Layout styles -->
+  <link rel="stylesheet" href="{% static 'assets/css/style.css' %}" />
+  <link rel="stylesheet" href="{% static 'assets/css/mystyle.css' %}" />
+  <!-- End layout styles -->
+  <link rel="shortcut icon" href="{% static 'assets/images/favicon.ico' %}" />
+  <style>
+    .pagination {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 20px;
+    }
+    
+    .page-circle {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #3498db;
+      color: #fff;
+      text-align: center;
+      line-height: 30px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    
+    .page-circle.active {
+      background-color: #fff;
+      color: #3498db;
+    }
+    
+    .prev,
+    .next {
+      background-color: #3498db;
+      color: #fff;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    
+    #pageCircles {
+      display: flex;
+      align-items: center;
+    }
+    tr{
+      background-color: #ced4da !important;
+    }
+    #policeStationDropdown {
+  border: 1px solid #555;
+  border-radius: 5px;
+  color: black;
+}
+  </style>
+</head>
+
+<body>
+  <div class="container-scroller">
+    {% include 'components/navbar.html' %}
+    <div class="container-fluid page-body-wrapper" style="height: 100vh">
+      {% include 'components/sidebar.html' %}
+      <div class="main-panel main-div ">
+        <div class="content-wrapper d-flex align-items-center auth p-0" style="background-color:white !important;">
+          <div class="row flex-grow bg-white" >
+              <div class="mx-auto bg-white">
+                  <div class="auth-form-light text-left py-1 bg-white">
+                      <div class="brand-logo mt-4 text-center">
+                          <h1>CRIMINALS RECORDS</h1>
+                      </div>
+                      <div class="col-lg-10 col-10 m-auto">
+                          <form action="/criminaldetail.html/" method="post">
+                              {% csrf_token %}
+                              {% if selected_station %}
+                              Selected Station : {{selected_station}}
+                              {% endif %}
+
+                              
+                              <div class="row">
+                                <div class="form-group mx-sm-3 mb-2 col-8">
+                                  <label for="searchInput" class="sr-only" style="font-size: 15px; ">Search Term:</label>
+                                  <input style="border: 1px solid #000; border-radius: 5px; color: #000;" type="text" class="form-control" id="searchInput" name="searchInput" placeholder="Enter search term" required>
+                                </div>
+                                <div class="form-group mb-4 col">
+                                  <label for="policeStationDropdown" style="font-size: 15px;">Select Police Station:</label>
+                                  <select class="form-control" id="policeStationDropdown" name="policeStationDropdown">
+                                    <option value="">-- Select Police Station --</option>
+                                    <option value="all">All_Records</option>
+                                    {% comment %} {% for station in police_stations %}
+                                      <option value="{{ station }}">{{ station }}</option>
+                                    {% endfor %} {% endcomment %}
+                                    <option value="BHOSARI">BHOSARI</option>
+                                    <option value="BHOSARI MIDC">BHOSARI MIDC</option>
+                                    <option value="CHIKHALI">CHIKHALI</option>
+                                    <option value="PIMPRI">PIMPRI</option>
+                                    <option value="CHINCHWAD">CHINCHWAD</option>
+                                    <option value="NIGADI">NIGADI</option>
+                                    <option value="CHAKAN">CHAKAN</option>
+                                    <option value="ALANDI">ALANDI</option>
+                                    <option value="DIGHI">DIGHI</option>
+                                    <option value="MHALUNGE">MHALUNGE</option>
+                                    <option value="SANGHI">SANGHI</option>
+                                    <option value="WAKAD">WAKAD</option>
+                                    <option value="HINJEWADI">HINJEWADI</option>
+                                    <option value="RAVET">RAVET</option>
+                                    <option value="DEHUROAD">DEHUROAD</option>
+                                    <option value="TALEGAON DABHADE">TALEGAON DABHADE</option>
+                                    <option value="SHIRGAON">SHIRGAON</option>
+                                    <option value="TALEGAON MIDC">TALEGAON MIDC</option>
+                                  </select>
+                                </div>
+                              </div>
+                              
+                            
+
+                          </form>
+                          <!-- This div will be populated with search suggestions -->
+                          <div id="suggestions"></div>
+                          <!-- Table to display criminals -->
+                          <div class="table-responsive" id="searchCrimeResult_Hide">
+                              <table class="table table-bordered table-hover table-fixed">
+                                  <thead class="thead-light">
+                                      <tr class=" bg-dribbble text-black-100 fs-4 mx-auto">
+                                          <th class="py-3 p-5">FIRST NAME</th>
+                                          <th class="py-3 p-5">LAST NAME</th>
+                                          <th class="py-3 p-5">POLICE STATION</th>
+                                          <th class="py-3 p-5">CRIME DETAILS</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody class="text-center">
+                                      {% for criminal in page_obj %}
+                                      <tr class="{% cycle 'bg-white' 'bg-light' %}">
+                                          <td>{{ criminal.first_name }}</td>
+                                          <td>{{ criminal.last_name }}</td>
+                                          <td>{{ criminal.police_station }}</td>
+                                          <td class="d-flex flex-wrap text-center">
+                                              {% for crime_type in criminal.crime_types %}
+                                              <a class="btn btn-outline-info btn-sm mb-2 me-4 justify-content-evenly" href="{% url 'main:showupdate' param1=criminal.first_name param2=criminal.last_name param3=crime_type %}">
+                                                  {{ crime_type }}<br>
+                                              </a>
+                                              {% endfor %}
+                                          </td>
+                                      </tr>
+                                      {% endfor %}
+                                  </tbody>
+                              </table>
+                          </div>
+                          <div class="table-responsive" style="display:none;" id="searchCrimeResult">
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="pagination" id="pagination">
+          {% if page_obj.has_previous %}
+          <a href="?page=1" class="prev">&laquo; First</a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="prev">Previous</a>
+          {% endif %}
+          <div id="pageCircles" class="flex-wrap">
+              {% for num in page_obj.paginator.page_range %}
+              {% if num == 1 or num == page_obj.paginator.num_pages %}
+              <a href="?page={{ num }}" class="page-circle {% if num == page_obj.number %}active{% endif %}" onclick="changePage({{ num }})">{{ num }}</a>
+              {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+              <a href="?page={{ num }}" class="page-circle" onclick="changePage({{ num }})">{{ num }}</a>
+              {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+              <div class="page-circle">...</div>
+              {% endif %}
+              {% endfor %}
+          </div>
+          {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="next">Next</a>
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="next">Last &raquo;</a>
+          {% endif %}
+      </div>
+      <!-- End Pagination -->
+      <script src="{% static 'assets/vendors/js/vendor.bundle.base.js' %}"></script>
+  <script src="{% static 'assets/js/off-canvas.js' %}"></script>
+  <script src="{% static 'assets/js/hoverable-collapse.js' %}"></script>
+  <script src="{% static 'assets/js/misc.js' %}"></script>
+  <!-- Custom js for this page -->
+  <script src="{% static 'assets/js/file-upload.js' %}"></script>
+      
+  
+      <script>
+
+  $(document).ready(function () {
+    $("#searchInput").on("input", function () {
+      var searchTerm = $(this).val();
+      searchterm = searchTerm.trim();
+      if(searchTerm.length === 0)
+      {
+        $("#suggestions").html("");
+      }
+      else
+      {
+      {% comment %} if (document.getElementById('fir-submit').style.display == "none") { {% endcomment %}
+        $.ajax({
+          type: "GET",
+          url: "/searchcrimeresult.html/",
+          data: { search_term: searchTerm },
+          success: function (data) {
+            $("#searchCrimeResult").empty();
+            var text = '<form class="form-sample" action="/showupdate_combined/" method="post" id="crime-form">{% csrf_token %}' +
+              '<div class="a">Type of Crime : {{ data.0.crime_types }}</div>' +
+              '<table class="table table-bordered table-hover shadow-sm mt-3">' +
+              '<thead class="thead-dark"><tr>' +
+              '<th>FIR NUMBER</th><th>First Name</th><th>Last Name</th>' +
+              '<th>Type of Crime</th><th>Police Station</th><th>Actions</th>' +
+              '</tr></thead>';
+            var count = 0;
+
+            $.each(data.results, function (index, value) {
+              text += '<tbody><tr>' +
+                '<td>' + value[0] + '</td>' +
+                '<td>' + value[1] + '</td>' +
+                '<td>' + value[2] + '</td>' +
+                '<td>' + value[3] + '</td>' +
+                '<td>' + value[4] + '</td>' +
+                '<td>' +
+                '<a href="/displaycrime/?param1=' + value[0] + '" class="btn btn-info btn-sm">Additional Info</a>' +
+                '</td>' +
+                '</tr></tbody>';
+              count += 1; 
+            });
+
+            text += '</table></form>';
+
+            $("#searchCrimeResult").append(text);
+            
+            document.getElementById("searchCrimeResult").style.display="block";
+            document.getElementById("searchCrimeResult_Hide").style.display="none";
+            document.getElementById("pagination").style.display="none";
+
+            if (count === 0) {
+              $("#suggestions").html("<p class='text-danger mt-3'>No Matching Result..!</p>");
+              
+              document.getElementById("pagination").style.display="block";
+              document.getElementById("searchCrimeResult_Hide").style.display="block";
+            }
+            else{
+              console.log(searchTerm)
+              if(searchTerm === " " || searchTerm === ""){
+
+              }else{
+              $("#suggestions").html("");
+              }
+            }
+  
+              
+          }
+        });
+      } 
+    });
+  });
+</script>
+      <script>
+        $(document).ready(function() {
+            $('#policeStationDropdown').change(function() {
+                var selectedStation = $(this).val();
+                if (selectedStation) {
+                    // Redirect to the desired webpage
+                    {% comment %} window.location.href = '/samplepage.html'; {% endcomment %}
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var policeStationDropdown = document.getElementById('policeStationDropdown');
+    
+            policeStationDropdown.addEventListener('change', function() {
+                var selectedStation = this.value;
+                if (selectedStation !== '') {
+                    // Construct URL with parameters
+                    var url = '/get_police_station/?station=' + encodeURIComponent(selectedStation);
+                    // Redirect to the constructed URL
+                    window.location.href = url;
+                }
+            });
+        });
+    </script>
+  
+</body>
+
+</html>
+
+{% endblock %}

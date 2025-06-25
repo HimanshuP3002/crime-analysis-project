@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Microproject Management</title>
+<style>
+/* CSS styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+form {
+  margin-bottom: 20px;
+}
+
+input[type="text"], textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f2f2f2;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Create a Microproject</h2>
+  <form id="microprojectForm">
+    <input type="text" id="projectName" placeholder="Project Name" required>
+    <input type="text" id="adminName" placeholder="Admin Name" required>
+    <button type="submit">Create Microproject</button>
+  </form>
+
+  <h2>Microproject Topics</h2>
+  <table id="topicsTable">
+    <thead>
+      <tr>
+        <th>Project Name</th>
+        <th>Admin Name</th>
+        <th>Topic</th>
+      </tr>
+    </thead>
+    <tbody id="topicsBody">
+      <!-- Microproject topics will be displayed here -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+// JavaScript code
+document.getElementById('microprojectForm').addEventListener('submit', function(event) {
+  event.preventDefault();
+  
+  // Get form values
+  var projectName = document.getElementById('projectName').value;
+  var adminName = document.getElementById('adminName').value;
+  
+  // Create new row in the table
+  var newRow = document.createElement('tr');
+  newRow.innerHTML = `
+    <td>${projectName}</td>
+    <td>${adminName}</td>
+    <td contenteditable="true"></td>
+  `;
+  document.getElementById('topicsBody').appendChild(newRow);
+  
+  // Clear form fields
+  document.getElementById('projectName').value = '';
+  document.getElementById('adminName').value = '';
+});
+</script>
+
+</body>
+</html>
