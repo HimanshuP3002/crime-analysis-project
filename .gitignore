@@ -1,1 +1,8 @@
-"__pycache__/\n*.pyc\n.env\n*.env\ndb.sqlite3\nnode_modules/\nmedia/\nstaticfiles/" 
+__pycache__/
+*.pyc
+.env
+*.env
+db.sqlite3
+node_modules/
+media/
+staticfiles
